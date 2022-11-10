@@ -16,7 +16,7 @@ if("simbolos" %in% ls()){
 ui <- fluidPage(
 
     # Titulos de la aplicacion
-    titlePanel("ANALISIS BURSATIL"),
+    titlePanel("TENDENCIA DE ACCIONES"),
 
     # Sliderbar
     sidebarLayout(
