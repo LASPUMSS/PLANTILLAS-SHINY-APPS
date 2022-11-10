@@ -1,3 +1,3 @@
 # TENDENCIA DE ACCCIONES
 
-![](tendecia-acciones/assets/app-tendencias-acciones.jpg)
+![](tendecia-acciones/assets/app-tendencia-acciones.jpg)
