@@ -56,7 +56,7 @@ server <- function(input, output) {
         X <- na.interp(ts_ts(dta$hits))
         
         p1 <- autoplot(X) +
-            ggtitle(input$txtWord) +
+            ggtitle( toupper(input$txtWord) ) +
             autolayer(meanf(X, h=40),
                       series="Mean", PI=FALSE) +
             autolayer(rwf(X, h=40),
