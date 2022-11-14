@@ -31,7 +31,9 @@ ui <- fluidPage(
 
         # Donde se renderiza el grafico
         mainPanel(
+            
            plotOutput("distPlot")
+           
         )
     )
 )
@@ -73,6 +75,7 @@ server <- function(input, output) {
         p1()
         
     })
+    
     
 }
 
