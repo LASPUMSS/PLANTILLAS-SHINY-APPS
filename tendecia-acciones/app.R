@@ -1,10 +1,16 @@
+###########################################
 # CARGAR LIBRERIAS NECESARIAS
+###########################################
+
 library(shiny)
 library(quantmod)
 library(fpp2)
 library(tsbox)
 
+###########################################
 # CARGAR DATOS 
+###########################################
+
 if("simbolos" %in% ls()){
     rm(list = ls()[-(which.max(ls() %in% "simbolos"))])
 }else{
@@ -12,13 +18,16 @@ if("simbolos" %in% ls()){
     simbolos <- stockSymbols()
 }
 
+###########################################
 # DEFINIR LA UI DE LA APP
+###########################################
+
 ui <- fluidPage(
 
     # Titulos de la aplicacion
     titlePanel("TENDENCIA DE ACCIONES"),
 
-    # Sliderbar
+    # Slide
     sidebarLayout(
         sidebarPanel(
             textInput("txtStock", 
@@ -32,18 +41,26 @@ ui <- fluidPage(
 
         # Donde se renderiza el grafico
         mainPanel(
-           plotOutput("distPlot")
+           plotOutput("distPlot"),
+           textOutput("textIntercep"),
+           textOutput("textTrend")
         )
     )
 )
 
+###########################################
 # DEFINIR EL LADO DEL SERVER DE LA APP
+###########################################
+
 server <- function(input, output) {
     
-    p1 <- eventReactive(input$goButton,{
+    mod <- eventReactive(input$goButton,{
         
         if(is.null(input$txtStock)){
-            return()
+            salida <- list(p1="", 
+                           textoIntercepto="",
+                           textoTrend="")
+            return(salida)
         }
         
         company <- input$txtStock
@@ -62,6 +79,8 @@ server <- function(input, output) {
         rm(i)
         
         reg_01 = tslm(psComp[,5]~trend)
+        textoIntercepto <- paste("El intercepto es de: ", reg_01$coefficients[1])
+        textoTrend <- paste("La tasa de cambio por unidad de tiempo (Tendencia) es de:", reg_01$coefficients[2])
         
         p1 <- autoplot(psComp[,5]) + 
             autolayer(fitted(reg_01), series = "Trend") +
@@ -71,18 +90,35 @@ server <- function(input, output) {
             ggtitle(paste(nameComp,"-", company)) +
             guides(colour=guide_legend(title="Metodos")) +
             ylab("Precios") +
-            xlab("Dias") 
+            xlab("Dias")
         
-        return(p1)
+        salida <- list(p1=p1, 
+                       textoIntercepto=textoIntercepto,
+                       textoTrend=textoTrend)
+        
+        return(salida)
         
     })
-
+    
     output$distPlot <- renderPlot({
         
-        p1()
+        resul <- mod()
+        resul$p1
         
     })
+    
+    output$textIntercep <- renderText({
+        resul <- mod()
+        resul$textoIntercepto
+        })
+    
+    output$textTrend <- renderText({
+        resul <- mod()
+        resul$textoTrend
+        })
 }
 
+###########################################
 # CORRER LA APP
+###########################################
 shinyApp(ui = ui, server = server)
